@@ -3,9 +3,11 @@ package net.hexapro.hexaItems;
 import net.hexapro.hexaItems.commands.HexaCommand;
 import net.hexapro.hexaItems.listeners.ActionListener;
 import net.hexapro.hexaItems.managers.RecipeManager;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -73,21 +75,25 @@ public final class HexaItems extends JavaPlugin {
                 item.setType(Material.APPLE); // Force it to be an Apple
             }
 
-            if (item.hasItemMeta()) {
-                if (item.getItemMeta().hasItemMeta() && config.contains("food:")) {
+            if (config.contains("food")) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta != null) {
                     try {
-                        org.bukkit.inventory.meta.components.FoodComponent food = item.getItemMeta().getFood();
+                        org.bukkit.inventory.meta.components.FoodComponent food = meta.getFood();
                         food.setNutrition(config.getInt("food.nutrition", 0));
                         food.setSaturation((float) config.getDouble("food.saturation", 0.0));
-                        food.setCanAlwaysEat(config.getBoolean("food.can_always_equip", false));
-                        item.getItemMeta().setFood(food);
-                        item.setItemMeta(item.getItemMeta());
-                    } catch (Exception ignored) {}
+                        food.setCanAlwaysEat(config.getBoolean("food.can_always_eat", false));
+                        meta.setFood(food);
+                        item.setItemMeta(meta);
+                        
+                        edibleItems.add(id.toLowerCase());
+                    } catch (Exception e) {
+                        getLogger().warning("Failed to set food properties for item: " + id + " - " + e.getMessage());
+                    }
                 }
             }
 
             customItemsMap.put(id, item);
-            edibleItems.add(id.toLowerCase());
 
             Map<String, List<String>> actionMap = new HashMap<>();
             if (config.contains("actions:")) {
