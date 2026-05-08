@@ -1,0 +1,13 @@
+name: HexaItems
+version: '1.0'
+main: net.hexapro.hexaItems.HexaItems
+api-version: '1.21'
+prefix: HexaItems
+authors: [ 2026 HexaStudios, Inc. All rights reserved. ]
+description: A plugin for creating and customizing items
+website: https://hexastudios.dedyn.io/
+commands:
+  hexaitems:
+    description: Main command for HexaItems
+    usage: /<command> <item|reload>
+    aliases: [ hi ]
