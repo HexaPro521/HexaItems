@@ -1,0 +1,32 @@
+# This is an example item
+# To use it in-game do    /hi item give <player> examples/exampleitem
+#                                                   ↑          ↑
+# [Category folder (It doesn't have to be in any folder)] [The item id (The name of the file)]
+
+# The name of the item that will appear in-game
+name: "An example item"
+
+# The base material it will have
+# It has to be in capitals
+material: "STICK"
+
+# A lore (Description) of the item that will appear under the name
+# If you add a lore to food the nutrition and saturation icons will disappear
+lore:
+  - "This is an example item"
+  - "It demonstrate the functions"
+  - "of this plugin"
+
+# The model/texture of the item
+# If you have no idea check this website → https://minecraft.wiki/w/Items_model_definition
+# Item models are writen in lowercase and underscores
+item_model: "diamond_sword"
+
+# If the item can be stacked in the inventory
+stackable: 99
+
+food:
+  nutrition: 5
+  saturation: 5
+  can_always_eat: true
+  consume_seconds: 1.6

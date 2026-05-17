@@ -1,0 +1,25 @@
+# Should this plugin be enable?
+# by default this is set to true
+enable-plugin: true
+
+# What prefix should the messages in chat start with?
+# by default this is set to "[HexaItems]"
+cmd-feedback-prefix: "[HexaItems]"
+
+# Should we warn you about a newer version of this plugin
+warn-newer-version:
+  # Should we warn you in the console when the plugin starts
+  # by default this is set to true
+  console: true
+  # Should we warn the player in the chat when they join
+  # by default this is set to false
+  in-game: false
+
+# Should we message you in the console when the plugin enables or disables
+console-message:
+  # Should we message you in the console when the plugin enables
+  # by default this is set to true
+  enabled: true
+  # Should we message you in the console when the plugin enables
+  # by default this is set to true
+  disabled: true
