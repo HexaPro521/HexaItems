@@ -69,7 +69,8 @@ public class ConfigManager {
                 Map<String, List<String>> triggers = new HashMap<>();
                 for (String trigger : List.of("right_click", "left_click", "eat", "hit",
                         "equipped", "unequipped", "while_equipped",
-                        "drop", "sneak", "jump", "mob_drop")) {
+                        "drop", "sneak", "jump", "mob_drop",
+                        "land")) { // ← add land here
                     List<String> actions = cfg.getStringList("actions." + trigger);
                     if (!actions.isEmpty()) triggers.put(trigger, actions);
                 }

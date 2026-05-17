@@ -193,6 +193,31 @@ public class ActionListener implements Listener {
         if (actions != null) ActionParser.executeActions(killer, actions);
     }
 
+    // TRIGGER: LAND
+    @EventHandler
+    public void onLand(org.bukkit.event.entity.EntityDamageEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        if (event.getCause() != org.bukkit.event.entity.EntityDamageEvent.DamageCause.FALL) return;
+
+        // check mainhand
+        String id = getHexaId(player.getInventory().getItemInMainHand());
+
+        // check armor slots if not in hand
+        if (id == null) id = getHexaId(player.getInventory().getHelmet());
+        if (id == null) id = getHexaId(player.getInventory().getChestplate());
+        if (id == null) id = getHexaId(player.getInventory().getLeggings());
+        if (id == null) id = getHexaId(player.getInventory().getBoots());
+
+        if (id == null) return;
+
+        List<String> actions = getActions(id, "land");
+        if (actions == null) return;
+
+        // cancel fall damage for soft landing
+        event.setCancelled(true);
+        ActionParser.executeActions(player, actions);
+    }
+
     // ==========================================
     // HELPER METHODS
     // ==========================================
