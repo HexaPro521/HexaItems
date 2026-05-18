@@ -66,6 +66,90 @@ public class ActionParser {
                     } catch (Exception ignored) {}
                 }
 
+                case "PROJECTILE" -> {
+                    // [PROJECTILE] type:speed:yield:incendiary
+                    // [PROJECTILE] FIREBALL:1.5:3.0:true
+                    // [PROJECTILE] ARROW:2.0
+                    // [PROJECTILE] SNOWBALL:1.0
+                    try {
+                        String[] projParts = actionValue.split(":");
+                        if (projParts.length == 0) return;
+
+                        String type  = projParts[0].toUpperCase();
+                        double speed = projParts.length > 1 ? Double.parseDouble(projParts[1]) : 1.0;
+                        float yield  = projParts.length > 2 ? Float.parseFloat(projParts[2])  : 2.0f;
+                        boolean incendiary = projParts.length > 3 && Boolean.parseBoolean(projParts[3]);
+
+                        org.bukkit.util.Vector direction = player.getLocation().getDirection().multiply(speed);
+                        org.bukkit.Location spawnLoc = player.getEyeLocation().add(direction);
+
+                        switch (type) {
+                            case "FIREBALL" -> {
+                                org.bukkit.entity.Fireball e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.Fireball.class);
+                                e.setDirection(direction);
+                                e.setShooter(player);
+                                e.setYield(yield);
+                                e.setIsIncendiary(incendiary);
+                            }
+                            case "SMALL_FIREBALL", "SMALLFIREBALL" -> {
+                                org.bukkit.entity.SmallFireball e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.SmallFireball.class);
+                                e.setDirection(direction);
+                                e.setShooter(player);
+                            }
+                            case "ARROW" -> {
+                                org.bukkit.entity.Arrow e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.Arrow.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                                e.setPickupStatus(org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED);
+                            }
+                            case "SPECTRAL_ARROW" -> {
+                                org.bukkit.entity.SpectralArrow e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.SpectralArrow.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                                e.setPickupStatus(org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED);
+                            }
+                            case "SNOWBALL" -> {
+                                org.bukkit.entity.Snowball e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.Snowball.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                            }
+                            case "EGG" -> {
+                                org.bukkit.entity.Egg e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.Egg.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                            }
+                            case "ENDER_PEARL" -> {
+                                org.bukkit.entity.EnderPearl e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.EnderPearl.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                            }
+                            case "TRIDENT" -> {
+                                org.bukkit.entity.Trident e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.Trident.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                                e.setPickupStatus(org.bukkit.entity.AbstractArrow.PickupStatus.DISALLOWED);
+                            }
+                            case "WITHER_SKULL" -> {
+                                org.bukkit.entity.WitherSkull e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.WitherSkull.class);
+                                e.setDirection(direction);
+                                e.setShooter(player);
+                                e.setCharged(incendiary);
+                            }
+                            case "DRAGON_FIREBALL" -> {
+                                org.bukkit.entity.DragonFireball e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.DragonFireball.class);
+                                e.setDirection(direction);
+                                e.setShooter(player);
+                            }
+                            case "WIND_CHARGE" -> {
+                                org.bukkit.entity.WindCharge e = player.getWorld().spawn(spawnLoc, org.bukkit.entity.WindCharge.class);
+                                e.setVelocity(direction);
+                                e.setShooter(player);
+                            }
+                            default -> player.sendMessage("§cUnknown projectile type: " + type);
+                        }
+                    } catch (Exception e) { e.printStackTrace(); }
+                }
+
                 // --- POTION EFFECT
                 case "EFFECT" -> {
                     String[] effectParts = actionValue.split(":");
