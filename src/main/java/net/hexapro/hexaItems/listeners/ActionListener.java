@@ -29,7 +29,16 @@ import java.util.UUID;
 
 public class ActionListener implements Listener {
 
+    private static ActionListener instance;
     private final Map<UUID, BukkitTask> passiveEffects = new HashMap<>();
+
+    public ActionListener() {
+        instance = this; // ← add this
+    }
+
+    public static ActionListener getInstance() {
+        return instance;
+    }
 
     // --- gets the HexaItems ID from an item, or null if it's not a HexaItems item
     private String getHexaId(ItemStack item) {
@@ -58,6 +67,12 @@ public class ActionListener implements Listener {
         }
     }
 
+    // in ActionListener.java add this event
+    @EventHandler
+    public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
+        HexaItems.getInstance().getCooldownManager().clearCooldowns(event.getPlayer().getUniqueId());
+    }
+
     // ==========================================
     // TRIGGER: RIGHT CLICK
     // ==========================================
@@ -65,6 +80,7 @@ public class ActionListener implements Listener {
     public void onRightClick(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getHand() != org.bukkit.inventory.EquipmentSlot.HAND) return;
+
         String id = getHexaId(event.getItem());
         if (id == null) return;
 

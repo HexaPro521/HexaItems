@@ -146,6 +146,40 @@ public class ItemBuilder {
             } catch (Exception e) { e.printStackTrace(); }
         }
 
+        // --- HEAD
+        if (config.contains("head") && material == Material.PLAYER_HEAD) {
+            try {
+                org.bukkit.inventory.meta.SkullMeta skullMeta = (org.bukkit.inventory.meta.SkullMeta) meta;
+
+                // option 1 — player name
+                String owner = config.getString("head.owner");
+                if (owner != null) {
+                    skullMeta.setOwningPlayer(org.bukkit.Bukkit.getOfflinePlayer(owner));
+                }
+
+                // option 2 — base64 texture
+                String texture = config.getString("head.texture");
+                if (texture != null) {
+                    org.bukkit.profile.PlayerProfile profile = org.bukkit.Bukkit.createPlayerProfile(
+                            java.util.UUID.nameUUIDFromBytes(texture.getBytes()),
+                            "CustomHead"
+                    );
+                    org.bukkit.profile.PlayerTextures textures = profile.getTextures();
+
+                    // decode base64 to get the URL
+                    String decoded = new String(java.util.Base64.getDecoder().decode(texture));
+                    // decoded = {"textures":{"SKIN":{"url":"https://..."}}}
+                    String url = decoded.split("\"url\":\"")[1].split("\"")[0];
+
+                    textures.setSkin(new java.net.URL(url));
+                    profile.setTextures(textures);
+                    skullMeta.setOwnerProfile(profile);
+                }
+
+                meta = skullMeta;
+            } catch (Exception e) { e.printStackTrace(); }
+        }
+
         // --- ARMOR STATS
         if (config.contains("armor")) {
             try {

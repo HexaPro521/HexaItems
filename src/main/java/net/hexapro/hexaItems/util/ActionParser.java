@@ -1,5 +1,7 @@
 package net.hexapro.hexaItems.util;
 
+import net.hexapro.hexaItems.HexaItems;
+import net.hexapro.hexaItems.listeners.ActionListener;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -13,13 +15,17 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class ActionParser {
 
     public static void executeActions(Player player, List<String> actions) {
         if (actions == null || actions.isEmpty()) return;
 
-        for (String actionStr : actions) {
+        // build a flat list with repeat blocks expanded
+        List<String> expanded = expandRepeats(actions);
+
+        for (String actionStr : expanded) {
             if (!actionStr.startsWith("[") || !actionStr.contains("]")) continue;
 
             String[] parts = actionStr.split("]", 2);
@@ -27,6 +33,36 @@ public class ActionParser {
 
             String actionType = parts[0].substring(1).toUpperCase();
             String actionValue = parts[1].trim().replace("%player_name%", player.getName());
+
+            if (actionType.equals("COOLDOWN")) {
+                try {
+                    String[] cooldownParts = actionValue.split(":", 3);
+                    if (cooldownParts.length < 2) continue;
+
+                    String key     = cooldownParts[0].trim();
+                    long seconds   = Long.parseLong(cooldownParts[1].trim());
+                    String message = cooldownParts.length > 2 ? cooldownParts[2].trim() : null;
+
+                    CooldownManager cm = HexaItems.getInstance().getCooldownManager();
+
+                    if (!cm.trySetCooldown(player.getUniqueId(), key, seconds)) {
+                        if (message != null) {
+                            long remaining = cm.getRemainingTime(player.getUniqueId(), key);
+                            String msg = message.replace("%remaining%", String.valueOf(remaining));
+                            executeActions(player, List.of(msg));
+                        }
+                        return;
+                    }
+
+                    player.setCooldown(
+                            player.getInventory().getItemInMainHand().getType(),
+                            (int) (seconds * 20)
+                    );
+
+                } catch (Exception e) { e.printStackTrace(); }
+                continue;
+            }
+
 
             switch (actionType) {
 
@@ -258,5 +294,45 @@ public class ActionParser {
                 .replace("&k", "<obfuscated>").replace("&l", "<bold>")
                 .replace("&m", "<strikethrough>").replace("&n", "<underlined>")
                 .replace("&o", "<italic>").replace("&r", "<reset>");
+    }
+
+    private static List<String> expandRepeats(List<String> actions) {
+        List<String> result = new ArrayList<>();
+        int i = 0;
+
+        while (i < actions.size()) {
+            String action = actions.get(i);
+
+            // check if this is a [REPEAT] action
+            if (action.startsWith("[REPEAT]")) {
+                String[] parts = action.split("]", 2);
+                int times = 1;
+                try {
+                    times = Integer.parseInt(parts[1].trim());
+                } catch (Exception ignored) {}
+
+                // collect actions until [END]
+                List<String> block = new ArrayList<>();
+                i++;
+                while (i < actions.size() && !actions.get(i).equalsIgnoreCase("[END]")) {
+                    block.add(actions.get(i));
+                    i++;
+                }
+
+                // expand the block
+                for (int t = 0; t < times; t++) {
+                    result.addAll(block);
+                }
+
+            } else if (action.equalsIgnoreCase("[END]")) {
+                // orphan [END] — just skip it
+            } else {
+                result.add(action);
+            }
+
+            i++;
+        }
+
+        return result;
     }
 }

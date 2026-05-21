@@ -2,6 +2,7 @@ package net.hexapro.hexaItems;
 
 import net.hexapro.hexaItems.commands.CmdBase;
 import net.hexapro.hexaItems.config.ConfigManager;
+import net.hexapro.hexaItems.util.CooldownManager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import net.hexapro.hexaItems.listeners.ActionListener;
@@ -13,6 +14,7 @@ public class HexaItems extends JavaPlugin {
     // Variables
     private static HexaItems instance;
     private ConfigManager configManager;
+    private CooldownManager cooldownManager;
 
     @Override
     public void onEnable() {
@@ -23,6 +25,8 @@ public class HexaItems extends JavaPlugin {
 
         // Config setup
         configManager = new ConfigManager(this);
+
+        cooldownManager = new CooldownManager();
 
         // The commands setup
         getCommand("hexaitems").setExecutor(new CmdBase());
@@ -66,4 +70,6 @@ public class HexaItems extends JavaPlugin {
     public List<String> getEdibleItems() {
         return configManager.getEdibleItems();
     }
+
+    public CooldownManager getCooldownManager() { return cooldownManager; }
 }
